@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { actionCreators } from ".";
+import { useSelector } from "../hooks/useTypedSelector";
+import { useActions } from "../hooks/useActions";
 
 
 const RepositoriesList: React.FC = () => {
 
   const [term, setTerm]= useState('');
-  const dispatch = useDispatch();
+  const { searchRepositories } =useActions();
+  const {data, error, loading } = useSelector((state)=> state.repositories);
+  
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
-    dispatch(actionCreators.searchRepositories(term));
+    searchRepositories(term);
   };
 
   return (
@@ -18,6 +20,11 @@ const RepositoriesList: React.FC = () => {
     <form onSubmit={onSubmit}>
       <input value={term} onChange={(e) => setTerm(e.target.value)} type="text" />
       <button>Search</button>
+      {error && <h3>{error}</h3>}
+      {loading && <h3>Loading...</h3>}
+      {!error && !loading && 
+      data.map((name)=> <div key={name}>{name}</div>)
+       }
     </form>
   </div>
   );
